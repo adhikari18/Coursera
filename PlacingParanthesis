@@ -1,0 +1,95 @@
+using System;
+using System.Linq;
+using System.Security.AccessControl;
+
+namespace CourseraExercises
+{
+    //Knapsack dynamic
+    class PlacingParentheses
+    {
+        static void Main(string[] args)
+        {
+            var expression = Console.ReadLine();
+            //expression = "1+2";
+            var result = GetMaximValue(expression);
+            Console.WriteLine(result);
+        }
+
+        private static long GetMaximValue(string exp)
+        {
+            var op = new char[exp.Length / 2];
+            var digit = new int[exp.Length / 2 + 1];
+            int d = 0, o = 0;
+            for (var i = 0; i < exp.Length; i++)
+            {
+                if (i % 2 == 0)
+                {
+                    digit[d] = int.Parse(exp[i].ToString());
+                    d++;
+                }
+                else
+                {
+                    op[o] = exp[i];
+                    o++;
+                }
+            }
+            var n = digit.Length;
+            var m = new long[n,n];
+            var M = new long[n,n];
+            for (var i = 0; i < n; i++)
+            {
+                m[i,i] = digit[i];
+                M[i,i] = digit[i];
+            }
+            for (var s = 1; s < n; s++)
+            {
+                for (var i = 0; i < n - s; i++)
+                {
+                    var j = i + s;
+                    var temp = MinAndMax(i, j, op, m, M);
+                    m[i,j] = temp[0];
+                    M[i,j] = temp[1];
+                }
+            }
+            return M[0,n - 1];
+        }
+        private static long[] MinAndMax(int i, int j, char[] op, long[,] m, long[,] M)
+        {
+            var minValue = long.MaxValue;
+            var maxValue = -long.MaxValue;
+
+            for (var k = i; k < j; k++)
+            {
+                var a = Eval(M[i,k], M[k + 1,j], op[k]);
+                var b = Eval(M[i,k], m[k + 1,j], op[k]);
+                var c = Eval(m[i,k], M[k + 1,j], op[k]);
+                var d = Eval(m[i,k], m[k + 1,j], op[k]);
+                minValue = Math.Min(Math.Min(Math.Min(Math.Min(minValue, a), b), c), d);
+                maxValue = Math.Max(Math.Max(Math.Max(Math.Max(maxValue, a), b), c), d);
+            }
+            var result = new long[2];
+            result[0] = minValue;
+            result[1] = maxValue;
+            return result;
+        }
+        private static long Eval(long a, long b, char op)
+        {
+            if (op == '+')
+            {
+                return a + b;
+            }
+
+            if (op == '-')
+            {
+                return a - b;
+            }
+
+            if (op == '*')
+            {
+                return a * b;
+            }
+
+            return 0;
+        }
+    }
+}
