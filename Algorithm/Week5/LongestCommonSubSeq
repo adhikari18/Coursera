@@ -1,0 +1,80 @@
+using System;
+
+
+namespace Week5
+{
+    class LongestCommonSubSeq2
+    {
+        static void Main(string[] args)
+        {
+            var n = int.Parse(Console.ReadLine());
+            var arrayAStrings = Console.ReadLine().Split();
+            var arrayA = new int[n];
+            for (var i = 0; i < n; i++)
+            {
+                arrayA[i] = int.Parse(arrayAStrings[i]);
+            }
+
+            var m = int.Parse(Console.ReadLine());
+            var arrayBStrings = Console.ReadLine().Split();
+            var arrayB = new int[m];
+            for (var i = 0; i < m; i++)
+            {
+                arrayB[i] = int.Parse(arrayBStrings[i]);
+            }
+
+            Console.WriteLine(GetSubSeqOf2Seq(arrayA, arrayB));
+        }
+        private static int GetSubSeqOf2Seq(int[] a, int[] b)
+        {
+            var m = a.Length;
+            var n = b.Length;
+            var matrix = new int[m + 1,n + 1];
+            int i, j;
+            for (i = 0; i <= m; i++)
+            {
+                for (j = 0; j <= n; j++)
+                {
+                    if (i == 0 || j == 0)
+                    {
+                        matrix[i,j] = 0;
+                    }
+                    else if (a[i - 1] == b[j - 1])
+                    {
+                        matrix[i,j] = matrix[i - 1,j - 1] + 1;
+                    }
+                    else
+                    {
+                        matrix[i,j] = Math.Max(matrix[i - 1,j], matrix[i,j - 1]);
+                    }
+                }
+            }
+
+            var index = matrix[m,n];
+            var lcs = new int[index];
+
+            i = m;
+            j = n;
+            while (i > 0 && j > 0)
+            {
+                if (a[i - 1] == b[j - 1])
+                {
+                    lcs[index - 1] = a[i - 1];
+                    i--;
+                    j--;
+                    index--;
+                }
+                else if (matrix[i - 1,j] > matrix[i,j - 1])
+                {
+                    i--;
+                }
+                else
+                {
+                    j--;
+                }
+            }
+
+            return matrix[m, n];
+        }
+    }
+}
