@@ -1,0 +1,97 @@
+using System;
+using System.Collections.Generic;
+
+namespace DataStructures
+{
+    class BuildHeap
+    {
+        private static int[] _data;
+        private static List<Swap> _swaps;
+        static void Main(string[] args)
+        {
+            var n = int.Parse(Console.ReadLine());
+            var inputString = Console.ReadLine().Split();
+            _data = new int[n];
+            //data = new[] {1,2,3,4,5};
+            for (var i = 0; i < n; i++)
+            {
+                _data[i] = int.Parse(inputString[i]);
+            }
+
+            GenerateSwaps();
+            Console.WriteLine(_swaps.Count);
+            foreach (var swap in _swaps)
+            {
+                Console.WriteLine(swap.Index1 + " " + swap.Index2);
+            }
+        }
+
+        private static List<Swap> GenerateSwapsNaive()
+        {
+            _swaps = new List<Swap>();
+            // The following naive implementation just sorts 
+            // the given sequence using selection sort algorithm
+            // and saves the resulting sequence of swaps.
+            // This turns the given array into a heap, 
+            // but in the worst case gives a quadratic number of swaps.
+            // TODO: replace by a more efficient implementation
+            for (var i = 0; i < _data.Length; ++i)
+            {
+                for (var j = i + 1; j < _data.Length; ++j)
+                {
+                    if (_data[i] > _data[j])
+                    {
+                        _swaps.Add(new Swap(i, j));
+                        var tmp = _data[i];
+                        _data[i] = _data[j];
+                        _data[j] = tmp;
+                    }
+                }
+            }
+            return _swaps;
+        }
+
+        private static void GenerateSwaps()
+        {
+            _swaps = new List<Swap>();
+            for (var i = _data.Length / 2; i >= 0; i--)
+            {
+                Process(i);
+            }
+        }
+        
+        private static void Process(int i)
+        {
+            var n = _data.Length;
+            while (i * 2 + 1 < n)
+            {
+                var j = i * 2 + 1;
+                j = j + 1 < n && _data[j + 1] < _data[j] ? j + 1 : j;
+                if (_data[i] > _data[j])
+                {
+                    _swaps.Add(new Swap(i, j));
+                    var tmp = _data[i];
+                    _data[i] = _data[j];
+                    _data[j] = tmp;
+                    i = j;
+                }
+                else
+                {
+                    return;
+                }
+            }
+        }
+    }
+
+    class Swap
+    {
+        public int Index1 { get; set; }
+        public int Index2 { get; set; }
+
+        public Swap(int index1, int index2)
+        {
+            Index1 = index1;
+            Index2 = index2;
+        }
+    }
+}
