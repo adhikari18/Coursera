@@ -1,0 +1,50 @@
+using System;
+using System.Collections.Generic;
+using System.Linq;
+
+namespace Week3
+{
+    class CollectingSignatures
+    {
+        static void Main(string[] args)
+        {
+            var n = int.Parse(Console.ReadLine());
+            Segment[] segments = new Segment[n];
+            for (var i = 0; i < n; i++)
+            {
+                string[] coords = Console.ReadLine().Split();
+                segments[i] = new Segment{ Start = long.Parse(coords[0]), End = long.Parse(coords[1])};
+            }
+
+            var results = GetOptimalValue(n, segments);
+            Console.WriteLine(results.Count);
+            Console.WriteLine(string.Join(" ", results));
+        }
+        
+        private static List<long> GetOptimalValue(int n, Segment[] segments)
+        {
+            List<long> points = new List<long>(n);
+            var sortedSegments = segments.ToList().OrderBy(s => s.End);
+
+            var point = sortedSegments.ElementAt(0).End;
+            points.Add(point);
+
+            for (int i = 1; i < n; i++)
+            {
+                if (point < sortedSegments.ElementAt(i).Start || point > sortedSegments.ElementAt(i).End)
+                {
+                    point = sortedSegments.ElementAt(i).End;
+                    points.Add(point);
+                }
+            }
+
+            return points;
+        }
+    }
+
+    class Segment
+    {
+        public long Start { get; set; }
+        public long End { get; set; }
+    }
+}
