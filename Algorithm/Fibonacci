@@ -1,0 +1,35 @@
+using System;
+
+namespace Week2
+{
+    //Fibonacci
+    public class Fibonacci
+    {
+        static void Main(string[] args)
+        {
+            var number = int.Parse(Console.ReadLine());
+            long result;
+            if (number == 0)
+            {
+                result = 0;
+            }
+            else if (number == 1)
+            {
+                result = 1;
+            }
+            else
+            {
+
+                long[] array = new long[number + 1];
+                array[0] = 0;
+                array[1] = 1;
+                for (var i = 2; i <= number; i++)
+                {
+                    array[i] = array[i - 1] + array[i - 2];
+                }
+                result = array[number];
+            }
+            Console.WriteLine(result);
+        }
+    }
+}
