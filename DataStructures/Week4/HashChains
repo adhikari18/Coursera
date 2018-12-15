@@ -1,0 +1,96 @@
+using System;
+using System.Collections.Generic;
+using System.Linq;
+
+namespace HashTablesAndFunctions.HashChains
+{
+    internal class HashChains
+    {
+        private static List<string>[] _hashtable;
+        private static int _bucketCount;
+        private static readonly int Prime = 1000000007;
+        private static readonly int Multiplier = 263;
+
+
+        private static void Main(string[] args)
+        {
+            _hashtable = new List<string>[Multiplier];
+            for (var i = 0; i < Multiplier; i++)
+            {
+                _hashtable[i] = new List<string>();
+            }
+
+            _bucketCount = int.Parse(Console.ReadLine());
+            var n = int.Parse(Console.ReadLine());
+            for (var i = 0; i < n; i++)
+            {
+                var input = Console.ReadLine();
+                ProcessQuery(ReadQuery(input));
+            }
+        }
+
+        private static Query ReadQuery(string query)
+        {
+            var array = query.Split();
+            return array[0] != "check" ? new Query(array[0], array[1]) : new Query(array[0], int.Parse(array[1]));
+        }
+
+        private static void ProcessQuery(Query query)
+        {
+            switch (query.Type)
+            {
+                case "add":
+                    if (!_hashtable[HashFunction(query.Str)].Contains(query.Str))
+                        _hashtable[HashFunction(query.Str)].Insert(0, query.Str);
+                    break;
+                case "del":
+                    if (_hashtable[HashFunction(query.Str)].Contains(query.Str))
+                        _hashtable[HashFunction(query.Str)].Remove(query.Str);
+                    break;
+                case "find":
+                    WriteSearchResult(_hashtable[HashFunction(query.Str)].Contains(query.Str));
+                    break;
+                case "check":
+                    Console.WriteLine(string.Join(" ",_hashtable[query.Ind]));
+                    break;
+                default:
+                    throw new Exception(query.Type);
+            }
+        }
+
+        private static void WriteSearchResult(bool found)
+        {
+            Console.WriteLine(found ? "yes" : "no");
+        }
+
+        private static int HashFunction(string s)
+        {
+            long hash = 0;
+            for (var i = s.Length - 1; i >= 0; --i)
+            {
+                hash = (hash * Multiplier + s[i]) % Prime;
+            }
+
+            return (int)hash % _bucketCount;
+        }
+
+    }
+
+    internal class Query
+    {
+        public string Type { get; set; }
+        public string Str { get; set; }
+        public int Ind { get; set; }
+
+        public Query(string type, string s)
+        {
+            Type = type;
+            Str = s;
+        }
+        public Query(string type, int ind)
+        {
+            Type = type;
+            Ind = ind;
+        }
+    }
+}
