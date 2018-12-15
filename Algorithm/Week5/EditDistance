@@ -1,0 +1,43 @@
+using System;
+
+
+namespace Week5
+{
+    class EditDistance
+    {
+        static void Main(string[] args)
+        {
+            var first = Console.ReadLine();
+            var second = Console.ReadLine();
+            Console.WriteLine(GetResult(first, second));
+        }
+        private static int GetResult(string first, string second)
+        {
+            var n = first.Length;
+            var m = second.Length;
+            var result2DArray = new int[n + 1,m + 1];
+            for (var i = 0; i <= n; ++i)
+            {
+                result2DArray[i,0] = i;
+            }
+            for (var i = 0; i <= m; ++i)
+            {
+                result2DArray[0,i] = i;
+            }
+
+            for (var i = 1; i <= n; ++i)
+            {
+                for (var j = 1; j <= m; ++j)
+                {
+                    var cost = first[i - 1] == second[j - 1] ? 0 : 1;
+
+                    result2DArray[i,j] = Math.Min(
+                        Math.Min(result2DArray[i - 1, j], result2DArray[i, j - 1]) + 1,
+                        result2DArray[i - 1, j - 1] + cost);
+                }
+            }
+            return result2DArray[n,m];
+
+        }
+    }
+}
