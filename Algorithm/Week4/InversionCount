@@ -1,0 +1,73 @@
+using System;
+
+namespace Week4
+{
+    class InversionCount
+    {
+        static void Main(string[] args)
+
+        {
+            var n = Convert.ToInt32(Console.ReadLine());
+            var numbers = new int[n];
+            var inputString = Console.ReadLine().Split();
+            for (var i = 0; i < n; i++)
+            {
+                numbers[i] = Convert.ToInt32(inputString[i]);
+            }
+            
+            var inversionCount = MergeSort(numbers,n);
+            //Console.WriteLine(string.Join(" ", numbers));
+            Console.WriteLine(inversionCount);
+        }
+        static int MergeSort(int[] arr, int n)
+        {
+            var temp = new int[n];
+            return MergeSortRecursive(arr, temp, 0, n - 1);
+        }
+        static int MergeSortRecursive(int[] arr, int[] temp, int left, int right)
+        {
+            var invCount = 0;
+            if (right <= left) return invCount;
+            var mid = (right + left) / 2;
+            invCount = MergeSortRecursive(arr, temp, left, mid);
+            invCount += MergeSortRecursive(arr, temp, mid + 1, right);
+            invCount += Merge(arr, temp, left, mid + 1, right);
+            return invCount;
+        }
+        static int Merge(int[] arr, int[] temp, int left, int mid, int right)
+        {
+            var invCount = 0;
+
+            var i = left;
+            var j = mid;
+            var k = left;
+            while (i <= mid - 1 && j <= right)
+            {
+                if (arr[i] <= arr[j])
+                {
+                    temp[k++] = arr[i++];
+                }
+                else
+                {
+                    temp[k++] = arr[j++];
+                    invCount = invCount + (mid - i);
+                }
+            }
+            while (i <= mid - 1)
+            {
+                temp[k++] = arr[i++];
+            }
+
+            while (j <= right)
+            {
+                temp[k++] = arr[j++];
+            }
+
+            for (i = left; i <= right; i++)
+            {
+                arr[i] = temp[i];
+            }
+            return invCount;
+        }
+    }
+}
