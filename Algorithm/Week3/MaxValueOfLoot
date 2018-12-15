@@ -1,0 +1,50 @@
+using System;
+using System.Collections.Generic;
+using System.Linq;
+
+namespace Week3
+{
+    public class MaxValueOfLoot
+    {
+        static void Main(string[] args)
+        {
+            var firstLine = Console.ReadLine().Split();
+            var n = int.Parse(firstLine[0]);
+            var W = int.Parse(firstLine[1]);
+            int[] values = new int[n];
+            int[] weights = new int[n];
+            var vpws = new List<VPW>(values.Length);
+            for (var i = 0; i < n; i++)
+            {
+                var valueAndWeight = Console.ReadLine().Split();
+                values[i] = int.Parse(valueAndWeight[0]);
+                weights[i] = int.Parse(valueAndWeight[1]);
+                vpws.Add(new VPW { Index = i, ValuePerWeight = (double)values[i] / weights[i] });
+            }
+            var sortedVpws = vpws.OrderByDescending(x => x.ValuePerWeight).ToArray();
+            Console.WriteLine(GetOptimalValue(W, weights, sortedVpws, 0));
+        }
+
+        private static double GetOptimalValue(double capacity, int[] weights, VPW[] sortedVpws, double value)
+        {
+            if (sortedVpws.Length <= 0)
+            {
+                return value;
+            }
+            if (weights[sortedVpws[0].Index] >= capacity)
+            {
+                return value + sortedVpws[0].ValuePerWeight * capacity;
+            }
+
+            value += sortedVpws[0].ValuePerWeight * weights[sortedVpws[0].Index];
+            capacity = capacity - weights[sortedVpws[0].Index];
+            return GetOptimalValue(capacity, weights, sortedVpws.Skip(1).ToArray(), value);
+        }
+    }
+
+    public class VPW
+    {
+        public int Index { get; set; }
+        public double ValuePerWeight { get; set; }
+    }
+}
