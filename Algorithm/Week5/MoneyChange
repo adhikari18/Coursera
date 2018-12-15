@@ -1,0 +1,66 @@
+using System;
+
+
+namespace Week5
+{
+    class MoneyChange
+    {
+        static void Main(string[] args)
+        {
+            var n = int.Parse(Console.ReadLine());
+            int[] denominations = {1, 3, 4};
+            Console.WriteLine(GetMinCoinsDP(denominations, n));
+        }
+
+        static int GetMinNumberOfCoinsExponential(int[] denominations, int money)
+        {
+            if (money == 0)
+            {
+                return 0;
+            }
+
+            var result = int.MaxValue;
+
+            foreach (var t in denominations)
+            {
+                if (t <= money)
+                {
+                    var subResult = GetMinNumberOfCoinsExponential(denominations, money - t);
+                    if (subResult != int.MaxValue && subResult + 1 < result)
+                    {
+                        result = subResult + 1;
+                    }
+                }
+            }
+
+            return result;
+        }
+
+        static int GetMinCoinsDP(int[] coins, int money)
+        {
+            int m = coins.Length;
+            var table = new int[money + 1];
+            table[0] = 0;
+            for (var i = 1; i <= money; i++)
+            {
+                table[i] = int.MaxValue;
+            }
+            for (var i = 1; i <= money; i++)
+            {
+                for (var j = 0; j < m; j++)
+                {
+                    if (coins[j] <= i)
+                    {
+                        var subResult = table[i - coins[j]];
+                        if (subResult != int.MaxValue && subResult + 1 < table[i])
+                        {
+                            table[i] = subResult + 1;
+                        }
+                    }
+                }
+            }
+            return table[money];
+
+        }
+    }
+}
