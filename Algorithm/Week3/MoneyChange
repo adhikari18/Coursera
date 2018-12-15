@@ -1,0 +1,17 @@
+using System;
+
+namespace Week3
+{
+    class MoneyChange
+    {
+        static void Main(string[] args)
+        {
+            var m = int.Parse(Console.ReadLine());
+            var tens = m / 10;
+            var fives = (m % 10) / 5;
+            var singles = (m % 10) % 5;
+
+            Console.WriteLine(tens + fives + singles);
+        }
+    }
+}
