@@ -1,0 +1,80 @@
+using System;
+using System.Collections.Generic;
+using System.Linq;
+
+
+namespace Week5
+{
+    class PrimitiveCalculator
+    {
+        static void Main(string[] args)
+        {
+            var n = int.Parse(Console.ReadLine());
+            var result = GetResult(n);
+            Console.WriteLine(result.Count - 1);
+            Console.WriteLine(string.Join(" ", result));
+        }
+        private static List<int> GetResult(int n)
+        {
+            var sequence = new List<int>();
+            var resultArray = new int[n + 1];
+            int i;
+            for (i = 1; i < resultArray.Length; i++)
+            {
+                resultArray[i] = resultArray[i - 1] + 1;
+                if (i % 2 == 0)
+                {
+                    resultArray[i] = Math.Min(1 + resultArray[i / 2], resultArray[i]);
+                }
+
+                if (i % 3 == 0)
+                {
+                    resultArray[i] = Math.Min(1 + resultArray[i / 3], resultArray[i]);
+                }
+            }
+            i = n;
+            while (i > 1)
+            {
+                sequence.Add(i);
+                if (resultArray[i - 1] == resultArray[i] - 1)
+                {
+                    i = i - 1;
+                }
+                else if (i % 2 == 0 && (resultArray[i / 2] == resultArray[i] - 1))
+                {
+                    i = i / 2;
+                }
+                else if (i % 3 == 0 && (resultArray[i / 3] == resultArray[i] - 1))
+                {
+                    i = i / 3;
+                }
+            }
+            sequence.Add(1);
+            sequence.Reverse();
+            return sequence;
+        }
+
+        //Greedy is incorrect.
+        static int[] GetResultGreedyAlgorithm(int n)
+        {
+            var sequence = new List<int>();
+            while (n >= 1)
+            {
+                sequence.Add(n);
+                if (n % 3 == 0)
+                {
+                    n /= 3;
+                }
+                else if (n % 2 == 0)
+                {
+                    n /= 2;
+                }
+                else
+                {
+                    n -= 1;
+                }
+            }
+            return sequence.OrderBy(x => x).ToArray();
+        }
+    }
+}
