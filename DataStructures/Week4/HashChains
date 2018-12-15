@@ -2,6 +2,10 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 
+/*
+*Failed case #19/46: Wrong answer
+*(Time used: 0.04/1.50, memory used: 26476544/536870912.)
+*/
 namespace HashTablesAndFunctions.HashChains
 {
     internal class HashChains
