@@ -1,0 +1,86 @@
+using System;
+
+namespace Week4
+{
+    class BinarySearch
+    {
+        static void Main(string[] args)
+        {
+            string[] firstLine = Console.ReadLine().Split();
+            string[] secondLine = Console.ReadLine().Split();
+
+            var n = long.Parse(firstLine[0]);
+            long[] firstLineValues = new long[n];
+
+            var k = long.Parse(secondLine[0]);
+            long[] secondLineValues = new long[k];
+
+
+            for (int i = 0; i < n; i++)
+            {
+                firstLineValues[i] = long.Parse(firstLine[i + 1]);
+            }
+
+            for (int i = 0; i < k; i++)
+            {
+                secondLineValues[i] = long.Parse(secondLine[i + 1]);
+            }
+
+            Console.WriteLine(GetResult(firstLineValues, secondLineValues));
+        }
+
+        static string GetResult(long[] first, long[] second)
+        {
+            int length = second.Length;
+            if(length == 0) { return String.Empty;}
+            int[] results = new int[length];
+            for (var i = 0; i < length; i++)
+            {
+                results[i] = BinarySearchIterative(first, second[i], 0, first.Length - 1);
+            }
+            return string.Join(" ", results);
+        }
+
+        static int BinarySearchIterative(long[] inputArray, long key, int min, int max)
+        {
+            if (min > max)
+            {
+                return -1;
+            }
+            while (min <= max)
+            {
+                int mid = (min + max) / 2;
+                if (key == inputArray[mid])
+                {
+                    return mid;
+                }
+                if (key < inputArray[mid])
+                {
+                    max = mid - 1;
+                }
+                else
+                {
+                    min = mid + 1;
+                }
+            }
+            return -1;
+        }
+        static int BinarySearchRecursive(long[] inputArray, long key, int min, int max)
+        {
+            if (min > max || inputArray.Length == 0)
+            {
+                return -1;
+            }
+            int mid = (min + max) / 2;
+            if (key == inputArray[mid])
+            {
+                return mid;
+            }
+            if (key < inputArray[mid])
+            {
+                return BinarySearchRecursive(inputArray, key, min, mid - 1);
+            }
+            return BinarySearchRecursive(inputArray, key, mid + 1, max);
+        }
+    }
+}
