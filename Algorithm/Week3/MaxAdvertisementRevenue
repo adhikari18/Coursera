@@ -1,0 +1,36 @@
+using System;
+
+namespace Week3
+{
+    class MaxAdvertisementRevenue
+    {
+        static void Main(string[] args)
+        {
+            var n = int.Parse(Console.ReadLine());
+            string[] secondLine = Console.ReadLine().Split();
+            string[] thirdLine = Console.ReadLine().Split();
+            long[] profits = new long[n];
+            long[] clicks = new long[n];
+            for (var i = 0; i < n; i++)
+            {
+                profits[i] = int.Parse(secondLine[i]);
+                clicks[i] = int.Parse(thirdLine[i]);
+            }
+
+            Array.Sort(profits);
+            Array.Sort(clicks);
+            Console.WriteLine(GetMaxValue(n, profits, clicks));
+        }
+
+        private static double GetMaxValue(int n, long[] profits, long[] clicks)
+        {
+            double value = 0;
+            for (var i = 0; i < n; i++)
+            {
+                value += profits[i] * clicks[i];
+            }
+
+            return value;
+        }
+    }
+}
