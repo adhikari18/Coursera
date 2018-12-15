@@ -1,0 +1,57 @@
+using System;
+using System.Collections.Generic;
+using System.Linq;
+
+namespace DataStructures
+{
+    class Stack
+    {
+        private static readonly char[] OpenBrackets = {'{', '[', '('};
+        private static readonly char[] ClosedBrackets = {'}', ']', ')'};
+        static void Main(string[] args)
+        {
+            var input = Console.ReadLine();
+            Console.WriteLine(CheckBrackets(input));
+        }
+
+        static string CheckBrackets(string input)
+        {
+            var stack = new Stack<char>();
+            var indexStack = new Stack<int>();
+            int i;
+            for (i = 0; i < input.Length; i++)
+            {
+                if (IsOpenBracket(input[i]))
+                {
+                    stack.Push(input[i]);
+                    indexStack.Push(i);
+                }
+                else if (IsClosedBracket(input[i]))
+                {
+                    if (stack.Count == 0)
+                    {
+                        return (++i).ToString();
+                    }
+                    var openCounterpart = OpenBrackets[Array.IndexOf(ClosedBrackets, input[i])];
+                    if(stack.Pop() != openCounterpart)
+                    {
+                        return (++i).ToString();
+                    }
+                    indexStack.Pop();
+                }
+            }
+
+            return stack.Count > 0 ? (indexStack.Pop()+1).ToString() : "Success";
+        }
+
+        private static bool IsOpenBracket(char ch)
+        {
+            return OpenBrackets.Contains(ch);
+        }
+
+        private static bool IsClosedBracket(char ch)
+        {
+            return ClosedBrackets.Contains(ch);
+        }
+    }
+}
