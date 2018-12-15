@@ -1,1 +1,180 @@
-//TODO
+using System;
+using System.Collections.Generic;
+using System.Linq;
+
+namespace HashTablesAndFunctions
+{
+    class PhoneBook
+    {
+        private static int _a = -1, _b = -1;
+        private static readonly Random _random = new Random();
+        private static List<Contact>[] _hashtable;
+        // Cardinality of hash table
+        private static readonly int _m = 101;
+
+        static void Main(string[] args)
+        {
+            _hashtable = new List<Contact>[_m];
+            for (var i = 0; i < _m; i++)
+            {
+                _hashtable[i] = new List<Contact>();
+            }
+            var n = int.Parse(Console.ReadLine());
+            for (var i = 0; i < n; i++)
+            {
+                var input = Console.ReadLine();
+                ProcessQuery(ReadQuery(input));
+            }
+        }
+
+        private static void Insert(Query query)
+        {
+            var index = Hash(query.Number);
+            var contacts = _hashtable[index];
+            var cont = contacts.FirstOrDefault(x => x.Number == query.Number);
+            if (cont != null)
+            {
+                cont.Name = query.Name;
+            }
+            else
+            {
+                _hashtable[index].Add(new Contact(query.Name, query.Number));
+            }
+        }
+
+        private static void Remove(Query query)
+        {
+            var index = Hash(query.Number);
+            var contacts = _hashtable[index];
+            contacts.RemoveAll(x => x.Number == query.Number);
+        }
+
+        private static string Search(Query query)
+        {
+            var index = Hash(query.Number);
+            var contac = _hashtable[index].FirstOrDefault(c => c.Number == query.Number);
+            return contac != null ? contac.Name : "not found";
+        }
+
+        static Query ReadQuery(string query)
+        {
+            var array = query.Split();
+            if (array[0] == "add")
+            {
+                var number = int.Parse(array[1]);
+                var name = array[2];
+                return new Query("add", number, name);
+            }
+            else
+            {
+                var number = int.Parse(array[1]);
+                return new Query(array[0], number);
+            }
+        }
+
+        static void ProcessQuery(Query query)
+        {
+            if (query.Type.Equals("add"))
+            {
+                Insert(query);
+            }
+            else if (query.Type.Equals("del"))
+            {
+                Remove(query);
+            }
+            else
+            {
+                var response = Search(query);
+                Console.WriteLine(response);
+            }
+        }
+
+        /**
+         * Universal Hash Family.
+         * Select a random hash function h,
+         * from ((ax + b) mod p ) mod m,
+         * where 1 <= a <= p-1, 0 <= b <= p-1.
+         */
+        private static int Hash(int number)
+        {
+            var p = NextPrime(10000000);
+            var bound = p - 1;
+            if (_a == -1)
+            {
+                _a = (_random.Next(bound) + 1) % p;
+            }
+
+            if (_b == -1)
+            {
+                _b = _random.Next(bound + 1) % p;
+            }
+
+            var hashval = (_a * (number % p) % p + _b % p) % p % _m;
+            if (hashval < 0)
+            {
+                hashval += _m;
+            }
+
+            return hashval;
+        }
+
+        private static int NextPrime(int n)
+        {
+            if (n % 2 == 0)
+            {
+                n++;
+            }
+
+            while (!IsPrime(n))
+            {
+                n += 2;
+            }
+
+            return n;
+        }
+        private static bool IsPrime(int n)
+        {
+            if (n % 2 == 0)
+            {
+                return false;
+            }
+
+            for (var i = 3; i * i <= n; i += 2)
+            {
+                if (n % i == 0)
+                {
+                    return false;
+                }
+            }
+
+            return true;
+        }
+
+    }
+
+    class Contact
+    {
+        public string Name { get; set; }
+        public int Number { get; set; }
+
+        public Contact(string name, int number)
+        {
+            Name = name;
+            Number = number;
+        }
+    }
+
+    class Query
+    {
+        public string Type { get; set; }
+        public string Name { get; set; }
+        public int Number { get; set; }
+
+        public Query(string type, int number, string name = null)
+        {
+            Type = type;
+            Name = name;
+            Number = number;
+        }
+    }
+}
