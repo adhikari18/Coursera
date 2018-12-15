@@ -1,0 +1,21 @@
+using System;
+
+namespace Week2
+{
+    public class GCD
+    {
+        static void Main(string[] args)
+        {
+            string[] numbers = Console.ReadLine().Split();
+            long number1 = long.Parse(numbers[0]);
+            long number2 = long.Parse(numbers[1]);
+            long gcd = GetGCD(number1, number2);
+            Console.WriteLine(gcd);
+        }
+
+        private static long GetGCD(long number1, long number2)
+        {
+            return number2 == 0 ? number1 : GetGCD(number2, number1 % number2);
+        }
+    }
+}
