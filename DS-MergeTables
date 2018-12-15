@@ -1,0 +1,96 @@
+using System;
+
+namespace DataStructures
+{
+    internal class MergeTables
+    {
+        private static int _maximumNumberOfRows = -1;
+
+        private static void Main(string[] args)
+        {
+            var firstLine = Console.ReadLine().Split();
+            var n = int.Parse(firstLine[0]);
+            var m = int.Parse(firstLine[1]);
+            var secondLine = Console.ReadLine().Split();
+            var tables = new Table[n];
+            for (var i = 0; i < n; i++)
+            {
+                var numberOfRows = int.Parse(secondLine[i]);
+                tables[i] = new Table(numberOfRows);
+                _maximumNumberOfRows = Math.Max(_maximumNumberOfRows, numberOfRows);
+            }
+            for (var i = 0; i < m; i++)
+            {
+                var mergeLines = Console.ReadLine().Split();
+                var destination = int.Parse(mergeLines[0]) - 1;
+                var source = int.Parse(mergeLines[1]) - 1;
+                Merge(tables[destination], tables[source]);
+                Console.WriteLine(_maximumNumberOfRows);
+            }
+
+        }
+
+        private static void Merge(Table destination, Table source)
+        {
+            var realDestination = destination.GetParent();
+            var realSource = source.GetParent();
+            if (realDestination == realSource)
+            {
+                return;
+            }
+
+            if (realSource.Rank <= realDestination.Rank)
+            {
+                realSource.Parent = realDestination;
+                realDestination.NumberOfRows += realSource.NumberOfRows;
+                realSource.NumberOfRows = 0;
+            }
+            else
+            {
+                realDestination.Parent = realSource;
+                realSource.NumberOfRows += realDestination.NumberOfRows;
+                realDestination.NumberOfRows = 0;
+            }
+            if (realSource.Rank == realDestination.Rank)
+            {
+                realDestination.Rank++;
+            }
+
+            _maximumNumberOfRows = Math.Max(
+                Math.Max(_maximumNumberOfRows, realSource.NumberOfRows),
+                realDestination.NumberOfRows);
+        }
+
+         
+    }
+
+    internal class Table
+    {
+        public Table Parent;
+
+        public int Rank;
+        public int NumberOfRows;
+
+        public Table(int numberOfRows)
+        {
+            NumberOfRows = numberOfRows;
+            Rank = 0;
+            Parent = this;
+        }
+        public Table GetParent()
+        {
+            Table superRoot = this, i = this;
+            while (superRoot != superRoot.Parent)
+            {
+                superRoot = superRoot.Parent;
+            }
+            while (i != superRoot)
+            {
+                var oldParent = i.Parent;
+                i.Parent = superRoot;
+                i = oldParent;
+            }
+            return superRoot;
+        }
+    }
+}
