@@ -1,0 +1,38 @@
+using System;
+using System.Collections.Generic;
+
+namespace Week3
+{
+    class MaxNumberOfPrizes
+    {
+        static void Main(string[] args)
+        {
+            var n = int.Parse(Console.ReadLine());
+            var results = GetMaxPrizes(n);
+            Console.WriteLine(results.Count);
+            Console.WriteLine(string.Join(" ", results));
+        }
+        
+        private static List<long> GetMaxPrizes(int n)
+        {
+            List<long> points = new List<long>(n);
+            if (n <= 2)
+            {
+                points.Add(n);
+                return points;
+            }
+            long sum = 0;
+            for (var i = 1; sum < n; i++)
+            {
+                sum += i;
+                if ((n - sum) <= i)
+                {
+                    points.Add(n - sum + i);
+                    break;
+                }
+                points.Add(i);
+            }
+            return points;
+        }
+    }
+}
