@@ -1,0 +1,77 @@
+using System;
+
+namespace Week4
+{
+    class MergeSortAlgorithm
+    {
+        static void Main(string[] args)
+
+        {
+            int n = Convert.ToInt32(Console.ReadLine());
+            int[] numbers = new int[n];
+            string[] inputString = Console.ReadLine().Split();
+            for (int i = 0; i < n; i++)
+            {
+                numbers[i] = Convert.ToInt32(inputString[i]);
+            }
+
+            Sort(numbers, 0, n - 1);
+            Console.WriteLine(string.Join(" ", numbers));
+            Console.ReadLine();
+        }
+
+        static void Sort(int[] array, int left, int right)
+        {
+            if (right > left)
+            {
+                var mid = (left + right) / 2;
+                Sort(array, left, mid);
+                Sort(array, mid + 1, right);
+
+                Merge(array, left, mid, right);
+            }
+        }
+        static void Merge(int[] arr, int l, int m, int r)
+        {
+            var n1 = m - l + 1;
+            var n2 = r - m;
+
+            var lArray = new int[n1];
+            var rArray = new int[n2];
+
+            int i, j;
+            for (i = 0; i < n1; ++i)
+            {
+                lArray[i] = arr[l + i];
+            }
+            for (j = 0; j < n2; ++j)
+            {
+                rArray[j] = arr[m + 1 + j];
+            }
+
+            i = 0;
+            j = 0;
+            var k = l;
+            while (i < n1 && j < n2)
+            {
+                if (lArray[i] <= rArray[j])
+                {
+                    arr[k++] = lArray[i++];
+                }
+                else
+                {
+                    arr[k++] = rArray[j];
+                    j++;
+                }
+            }
+            while (i < n1)
+            {
+                arr[k++] = lArray[i++];
+            }
+            while (j < n2)
+            {
+                arr[k++] = rArray[j++];
+            }
+        }
+    }
+}
