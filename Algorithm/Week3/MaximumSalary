@@ -1,0 +1,65 @@
+using System;
+using System.Linq;
+
+namespace Week3
+{
+    class MaximumSalary
+    {
+        static void Main(string[] args)
+        {
+            var n = int.Parse(Console.ReadLine());
+            var longStrings = Console.ReadLine().Split();
+            long[] longs = new long[n];
+            for (var i = 0; i < n; i++)
+            {
+                longs[i] = long.Parse(longStrings[i]);
+            }
+
+            var result = GetMaxValue(longs);
+            Console.WriteLine(result);
+        }
+        
+        private static string GetMaxValueFromSingleDigitList(long[] Digits)
+        {
+            var newList = Digits.ToList();
+            string answer = String.Empty;
+            while (newList.Count > 0)
+            {
+                long maxDigit = newList.Max(x => x);
+                answer += maxDigit;
+                newList = newList.Where(x => x != maxDigit).ToList();
+            }
+            return answer;
+        }
+
+        private static string GetMaxValue(long[] Digits)
+        {
+            string answer = string.Empty;
+
+            while (Digits.Length > 0)
+            {
+                long maxDigit = 0;
+                foreach (var digit in Digits)
+                {
+                    if (IsGreaterOrEqual(digit, maxDigit))
+                    {
+                        maxDigit = digit;
+                    }
+                }
+
+                answer += maxDigit;
+                var whereIsMax = Digits.ToList().IndexOf(maxDigit);
+                var temp = Digits.ToList();
+                temp.RemoveAt(whereIsMax);
+                Digits = temp.ToArray();
+            }
+
+            return answer;
+        }
+
+        private static bool IsGreaterOrEqual(long a, long b)
+        {
+            return long.Parse($"{a}{b}") > long.Parse($"{b}{a}");
+        }
+    }
+}
