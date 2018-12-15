@@ -1,0 +1,73 @@
+using System;
+
+
+namespace Week5
+{
+    //TODO: Fix logic. Not passing second test locally
+    class LongestCommonSubSeq3
+    {
+        static void Main(string[] args)
+        {
+            var m = int.Parse(Console.ReadLine());
+            var arrayAStrings = Console.ReadLine().Split();
+            var arrayA = new int[m];
+            for (var i = 0; i < m; i++)
+            {
+                arrayA[i] = int.Parse(arrayAStrings[i]);
+            }
+
+            var n = int.Parse(Console.ReadLine());
+            var arrayBStrings = Console.ReadLine().Split();
+            var arrayB = new int[n];
+            for (var i = 0; i < n; i++)
+            {
+                arrayB[i] = int.Parse(arrayBStrings[i]);
+            }
+
+            var p = int.Parse(Console.ReadLine());
+            var arrayCStrings = Console.ReadLine().Split();
+            var arrayC = new int[p];
+            for (var i = 0; i < m; i++)
+            {
+                arrayC[i] = int.Parse(arrayCStrings[i]);
+            }
+
+            Console.WriteLine(GetSubSeqOf3Seq(arrayA, arrayB, arrayC));
+        }
+
+        private static int GetSubSeqOf3Seq(int[] a, int[] b, int[] c)
+        {
+            var m = a.Length;
+            var n = b.Length;
+            var p = c.Length;
+            var matrix = new int[m + 1,n + 1,p + 1];
+
+            for (var i = 0; i <= m; i++)
+            {
+                for (var j = 0; j <= n; j++)
+                {
+                    for (var k = 0; k <= p; k++)
+                    {
+                        if (i == 0 || j == 0 || k == 0)
+                        {
+                            matrix[i,j,k] = 0;
+                        }
+                        else if (a[i - 1] == b[j - 1] && a[i - 1] == c[k - 1])
+                        {
+                            matrix[i,j,k] = matrix[i - 1,j - 1,k - 1] + 1;
+                        }
+                        else
+                        {
+                            matrix[i, j, k] = Math.Max(Math.Max(
+                                Math.Max(
+                                    Math.Max(Math.Max(matrix[i - 1, j, k], matrix[i, j - 1, k]), matrix[i, j, k - 1]),
+                                    matrix[i - 1, j - 1, k]), 
+                                matrix[i - 1,j,k - 1]), matrix[i,j - 1,k - 1]);
+                        }
+                    }
+                }
+            }
+            return matrix[m,n,p];
+        }
+    }
+}
