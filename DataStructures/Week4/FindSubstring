@@ -1,0 +1,115 @@
+//Time exceeded
+
+using System;
+using System.Collections.Generic;
+
+namespace HashTablesAndFunctions
+{
+    internal class RabinKarp
+    {
+        private static int _prime;
+        private static int _multiplier = 31;
+        private static void Main(string[] args)
+        {
+            var P = Console.ReadLine();
+            var T = Console.ReadLine();
+            Console.WriteLine(string.Join(" ", GetOccurrences(P, T)));
+        }
+
+
+        public static List<int> GetOccurrences(string P, string T)
+        {
+            var occurrences = new List<int>();
+            int t = T.Length, p = P.Length;
+
+            _prime = NextPrime(t * p);
+
+            var hashes = PrecomputeHashes(T, p, _prime, _multiplier);
+            for (var i = 0; i <= t - p; i++)
+            {
+                var substr = T.Substring(i, p);
+                if (Hash(substr) != hashes[i])
+                {
+                    continue;
+                }
+
+                var matching = true;
+                for (var j = 0; j < p; j++)
+                {
+                    if (substr[j] == P[j])
+                    {
+                        continue;
+                    }
+
+                    matching = false;
+                    break;
+                }
+                if (matching)
+                {
+                    occurrences.Add(i);
+                }
+            }
+            return occurrences;
+        }
+
+        private static int[] PrecomputeHashes(
+            string text,
+            int pLength,
+            int prime,
+            int multiplier)
+        {
+            var tLength = text.Length;
+            var sub = tLength - pLength;
+            var hashes = new int[sub + 1];
+            hashes[sub] = Hash(text.Substring(sub));
+            var y = 1;
+            for (var i = 1; i <= pLength; i++)
+            {
+                y = (y * multiplier) % prime;
+            }
+            for (var i = sub - 1; i >= 0; i--)
+            {
+                var subtraction = text[i] - y * text[i + pLength];
+                hashes[i] = (hashes[i + 1] * multiplier % prime +
+                            (subtraction % prime + prime) % prime) % prime;
+        }
+            return hashes;
+        }
+
+        private static int Hash(string str)
+        {
+            long hashval = 0;
+            for (var i = str.Length - 1; i >= 0; i--)
+            {
+                hashval = (str[i] + hashval * _multiplier) % _prime;
+            }
+            return (int)hashval;
+        }
+        private static int NextPrime(int n)
+        {
+            if (n % 2 == 0)
+            {
+                n++;
+            }
+
+            while (!IsPrime(n))
+            {
+                n += 2;
+            }
+
+            return n;
+        }
+        private static bool IsPrime(int n)
+        {
+            for (var i = 3; i * i <= n; i += 2)
+            {
+                if (n % i == 0)
+                {
+                    return false;
+                }
+            }
+            return true;
+        }
+
+    }
+}
