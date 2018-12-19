@@ -1,3 +1,227 @@
+time exceeded
+
+//Time exceeded+
+
+using System;
+using System.Collections.Generic;
+using System.Text;
+
+namespace HashTablesAndFunctions
+{
+    //public static class Extensions{
+
+    //    public static StringBuilder MySubString(this StringBuilder input, int index, int length)
+    //    {
+    //        StringBuilder subString = new StringBuilder();
+            
+    //        int endIndex = index + length;
+    //        for (int i = index; i < endIndex; i++)
+    //        {
+    //            subString.Append(input[i]);
+    //        }
+    //        return subString;
+    //    }
+    //}
+    internal class RabinKarp
+    {
+        private static int _prime;
+        private static int _multiplier = 31;
+        private static StringBuilder _sb;
+        private static void Main(string[] args)
+        {
+            var P = Console.ReadLine();
+            var T = Console.ReadLine();
+
+            _sb = new StringBuilder(T);
+
+            Console.WriteLine(string.Join(" ", GetOccurrences(P, T)));
+            //_prime = NextPrime(P.Length * T.Length);
+            //Console.WriteLine(string.Join(" ", Search(P, T, _prime)));
+            //
+        }
+
+        /*
+         * Failed case #26/52: Wrong answer
+
+             (Time used: 0.02/1.50, memory used: 20594688/536870912.)
+         */
+
+        static List<int> Search(string pat, string txt, int q)
+        {
+            var result = new List<int>();
+            var multiplier = 31;
+            int patL = pat.Length;
+            int txtL = txt.Length;
+            int i, j;
+            int p = 0;
+            long t = 0;
+            long hashVal = 1;
+            for (i = 0; i < patL - 1; i++)
+                hashVal = (hashVal * multiplier) % q;
+
+
+            for (i = 0; i < patL; i++)
+            {
+                p = (multiplier * p + pat[i]) % q;
+                t = (multiplier * t + txt[i]) % q;
+            }
+
+            for (i = 0; i <= txtL - patL; i++)
+            {
+                if (p == t)
+                {
+                    for (j = 0; j < patL; j++)
+                    {
+                        if (txt[i + j] != pat[j])
+                            break;
+                    }
+
+                    if (j == patL)
+                        result.Add(i);
+                }
+
+                if (i < txtL - patL)
+                {
+                    t = (multiplier * (t - txt[i] * hashVal) + txt[i + patL]) % q;
+
+                    if (t < 0)
+                        t = t + q;
+                }
+            }
+
+            return result;
+        }
+
+        
+        static bool AreEqual(int mi, int pi, string S2)
+        {
+            for (int i = 0; i < pi; i++)
+            {
+                if (_sb[i + mi] != S2[i])
+                {
+                    return false;
+                }
+            }
+            return true;
+
+        }
+        public static List<int> GetOccurrences(string P, string T)
+        {
+            var occurrences = new List<int>();
+            int t = T.Length, p = P.Length;
+
+            _prime = 1000000007;//NextPrime(t * p);
+            _multiplier = new Random().Next() % (_prime - 1) + 1;
+            var pHash = Hash(P);
+            int tHash;
+            //var sb = new StringBuilder(T);
+            //var hashes = PrecomputeHashes(T, p, _prime, _multiplier);
+            for (var i = 0; i <= t - p; i++)
+            {
+                //sb = sb.MySubString(i, p);
+                //var substr = sb.ToString();
+                //var substr = sb.ToString(i, p);
+                tHash = Hash(i, p);
+
+                //var substr = ApplySubString(T, i, p);
+                if (tHash != pHash)
+                //if (pHash != hashes[i])
+                {
+                    continue;
+                }
+
+                var eq = AreEqual(i, p, P);
+                //var matching = true;
+                //for (var j = 0; j < p; j++)
+                //{
+                //    if (T[i + j] == P[j])
+                //    {
+                //        continue;
+                //    }
+
+                //    matching = false;
+                //    break;
+                //}
+                if (eq)
+                {
+                    occurrences.Add(i);
+                }
+            }
+            return occurrences;
+        }
+
+        //private static long[] PrecomputeHashes(
+        //    string text,
+        //    int pLength,
+        //    int prime,
+        //    int multiplier)
+        //{
+        //    var tLength = text.Length;
+        //    var sub = tLength - pLength;
+        //    var hashes = new long[sub + 1];
+        //    //hashes[sub] = Hash(text.Substring(sub));
+        //    hashes[sub] = Hash(ApplySubString(text, sub, text.Length - sub));
+        //    var y = 1;
+        //    for (var i = 1; i <= pLength; i++)
+        //    {
+        //        y = (y * multiplier) % prime;
+        //    }
+        //    for (var i = sub - 1; i >= 0; i--)
+        //    {
+        //        var subtraction = text[i] - y * text[i + pLength];
+        //        hashes[i] = (hashes[i + 1] * multiplier % prime +
+        //                    (subtraction % prime + prime) % prime) % prime;
+        //    }
+        //    return hashes;
+        //}
+
+        private static int Hash(int mi, int p)
+        {
+            int hashval = 0;
+            for (var i = mi + p - 1; i >= mi; i--)
+            {
+                hashval = (_sb[i] + hashval * _multiplier) % _prime;
+            }
+            return hashval;
+        }
+        private static int Hash(string str)
+        {
+            int hashval = 0;
+            for (var i = str.Length - 1; i >= 0; i--)
+            {
+                hashval = (str[i] + hashval * _multiplier) % _prime;
+            }
+            return hashval;
+        }
+        //private static int NextPrime(int n)
+        //{
+        //    if (n % 2 == 0)
+        //    {
+        //        n++;
+        //    }
+
+        //    while (!IsPrime(n))
+        //    {
+        //        n += 2;
+        //    }
+
+        //    return n;
+        //}
+        //private static bool IsPrime(int n)
+        //{
+        //    for (var i = 3; i * i <= n; i += 2)
+        //    {
+        //        if (n % i == 0)
+        //        {
+        //            return false;
+        //        }
+        //    }
+        //    return true;
+        //}
+
+    }
+}
+
 //Time exceeded
 
 using System;
