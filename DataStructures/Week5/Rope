@@ -1,0 +1,263 @@
+using System;
+using System.Collections.Generic;
+
+namespace HashTablesAndFunctions
+{
+    internal class Vertex
+    {
+        public char Key { get; set; }
+        public long Size { get; set; }
+        public Vertex Left { get; set; }
+        public Vertex Right { get; set; }
+        public Vertex Parent { get; set; }
+
+        public Vertex(char key, long size, Vertex left, Vertex right, Vertex parent)
+        {
+            Key = key;
+            Size = size;
+            Left = left;
+            Right = right;
+            Parent = parent;
+        }
+    }
+
+    internal class Rope
+    {
+        public string Input { get; set; }
+        private Vertex _root;
+
+        public Rope(string input)
+        {
+            Input = input;
+            _root = null;
+            foreach (var t in Input)
+            {
+                var next = new Vertex(t, 1, null, null, null);
+                _root = Merge(_root, next);
+            }
+        }
+        
+
+        public void Update(Vertex v)
+        {
+            if (v == null) return;
+            v.Size = 1 + (v.Left?.Size ?? 0) +
+                (v.Right?.Size ?? 0);
+            if (v.Left != null)
+                v.Left.Parent = v;
+            if (v.Right != null)
+                v.Right.Parent = v;
+        }
+
+        private void small_rotation(Vertex v)
+        {
+            var parent = v.Parent;
+            if (parent == null)
+            {
+                return;
+            }
+            var grandparent = v.Parent.Parent;
+            if (parent.Left == v)
+            {
+                var m = v.Right;
+                v.Right = parent;
+                parent.Left = m;
+            }
+            else
+            {
+                var m = v.Left;
+                v.Left = parent;
+                parent.Right = m;
+            }
+            Update(parent);
+            Update(v);
+            v.Parent = grandparent;
+            if (grandparent != null)
+            {
+                if (grandparent.Left == parent)
+                {
+                    grandparent.Left = v;
+                }
+                else
+                {
+                    grandparent.Right = v;
+                }
+            }
+        }
+
+        private void big_rotation(Vertex v)
+        {
+            if (v.Parent.Left == v && v.Parent.Parent.Left == v.Parent)
+            {
+                // Zig-zig
+                small_rotation(v.Parent);
+                small_rotation(v);
+            }
+            else if (v.Parent.Right == v && v.Parent.Parent.Right == v.Parent)
+            {
+                // Zig-zig
+                small_rotation(v.Parent);
+                small_rotation(v);
+            }
+            else
+            {
+                // Zig-zag
+                small_rotation(v);
+                small_rotation(v);
+            }
+        }
+
+        private void Splay(ref Vertex root, Vertex v)
+        {
+            if (v == null)
+                return;
+            while (v.Parent != null)
+            {
+                if (v.Parent.Parent == null)
+                {
+                    small_rotation(v);
+                    break;
+                }
+                big_rotation(v);
+            }
+            root = v;
+        }
+
+        private Vertex Find(ref Vertex root, int leftNum)
+        {
+            var v = root;
+
+            while (v != null)
+            {
+                var s = v.Left?.Size ?? 0;
+                if (leftNum == (s + 1))
+                {
+                    break;
+                }
+
+                if (leftNum < (s + 1))
+                {
+                    v = v.Left;
+                }
+                else if (leftNum > (s + 1))
+                {
+                    v = v.Right;
+                    leftNum =(int) (leftNum - s - 1);
+                }
+            }
+            Splay(ref root, v);
+            return v;
+        }
+
+        private void Split(Vertex root, int key,ref Vertex left, ref Vertex right)
+        {
+            right = Find(ref root, key);
+            Splay(ref root, right);
+            if (right == null)
+            {
+                left = root;
+                return;
+            }
+            left = right.Left;
+            right.Left = null;
+            if (left != null)
+            {
+                left.Parent = null;
+            }
+            Update(left);
+            Update(right);
+        }
+
+        private Vertex Merge(Vertex left, Vertex right)
+        {
+            if (left == null)
+                return right;
+            if (right == null)
+                return left;
+            var minRight = right;
+            while (minRight.Left != null)
+            {
+                minRight = minRight.Left;
+            }
+            Splay(ref right, minRight);
+            right.Left = left;
+            Update(right);
+            return right;
+        }
+
+        private void Insert(ref Vertex root, int k, ref Vertex subString)
+        {
+            Vertex left = null;
+            Vertex right = null;
+            Split(root, k, ref left, ref right);
+            root = Merge(Merge(left, subString), right);
+        }
+
+        private string InOrderTraverse(Vertex root)
+        {
+            var result = "";
+            if (root == null)
+            {
+                return result;
+            }
+            
+            var s = new Stack<Vertex>();
+            var p = root;
+
+            while (p != null)
+            {
+                s.Push(p);
+                p = p.Left;
+            }
+
+            while (s.Count > 0)
+            {
+                p = s.Peek();
+                result = result  + p.Key;
+                s.Pop();
+                p = p.Right;
+                while (p != null)
+                {
+                    s.Push(p);
+                    p = p.Left;
+                }
+            }
+            return result;
+        }
+
+        public void Process(int i, int j, int k)
+        {
+            Vertex left = null;
+            Vertex right = null;
+            Vertex middle = null;
+            Split(_root, i + 1, ref left, ref middle);
+            Split(middle, j - i + 2, ref middle, ref right);
+            _root = Merge(left, right);
+            Insert(ref _root, k + 1, ref middle);
+            
+        }
+
+        public string GetResult()
+        {
+            return InOrderTraverse(_root);
+        }
+
+    }
+
+    internal class Driver
+    {
+        private static void Main(string[] args)
+        {
+            var input = Console.ReadLine();
+            var rope = new Rope(input);
+            var n = int.Parse(Console.ReadLine());
+            for (var i = 0; i < n; i++)
+            {
+                var ijk = Console.ReadLine().Split();
+                rope.Process(int.Parse(ijk[0]), int.Parse(ijk[1]), int.Parse(ijk[2]));
+            }
+            Console.WriteLine(rope.GetResult());
+            Console.ReadKey();
+        }
+    }
+}
