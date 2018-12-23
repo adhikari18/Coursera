@@ -1,0 +1,89 @@
+using System;
+using System.Collections.Generic;
+
+namespace BST
+{
+    public class TreeOrders
+    {
+        private static int n;
+        private static List<int> key;
+        private static List<int> left;
+        private static List<int> right;
+        private static List<int> result;
+        
+        private static void Main(string[] args)
+        {
+            Read();
+            Print(InOrder());
+            Print(PreOrder());
+            Print(PostOrder());
+        }
+
+        static void Read()
+        {
+            key = new List<int>();
+            left = new List<int>();
+            right = new List<int>();
+            result = new List<int>();
+
+            n = int.Parse(Console.ReadLine());
+            for (int i = 0; i < n; i++)
+            {
+                var inputs = Console.ReadLine().Split();
+                key.Add(int.Parse(inputs[0]));
+                left.Add(int.Parse(inputs[1]));
+                right.Add(int.Parse(inputs[2]));
+            }
+        }
+
+        static List<int> InOrder()
+        {
+            result.Clear();
+            InOrderTraversal(0);
+            return result;
+        }
+        static void InOrderTraversal(int index)
+        {
+            if (left[index] != -1)
+                InOrderTraversal(left[index]);
+            result.Add(key[index]);
+            if (right[index] != -1)
+                InOrderTraversal(right[index]);
+        }
+
+        static List<int> PreOrder()
+        {
+            result.Clear();
+            PreOrderTraversal(0);
+            return result;
+        }
+        static void PreOrderTraversal(int index)
+        {
+            result.Add(key[index]);
+            if (left[index] != -1)
+                PreOrderTraversal(left[index]);
+            if (right[index] != -1)
+                PreOrderTraversal(right[index]);
+        }
+
+        static List<int> PostOrder()
+        {
+            result.Clear();
+            Post_order_traversal(0);
+            return result;
+        }
+        static void Post_order_traversal(int index)
+        {
+            if (left[index] != -1)
+                Post_order_traversal(left[index]);
+            if (right[index] != -1)
+                Post_order_traversal(right[index]);
+            result.Add(key[index]);
+        }
+
+        static void Print(List<int> printList)
+        {
+            Console.WriteLine(string.Join(" ", printList));
+        }
+    }
+}
