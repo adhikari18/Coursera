@@ -1,0 +1,81 @@
+using System;
+using System.Collections.Generic;
+using System.Linq;
+
+namespace BST
+{
+    public class IsBST
+    {
+        private static int n;
+        private static List<int> key;
+        private static List<int> left;
+        private static List<int> right;
+        private static List<int> result;
+
+        private static void Main(string[] args)
+        {
+            result = new List<int>();
+            Read();
+            if(n == 0)
+                Print(true);
+            else
+            {
+                InOrder();
+                Print(CheckBst());
+            }
+
+            Console.ReadKey();
+        }
+
+        static void Read()
+        {
+            key = new List<int>();
+            left = new List<int>();
+            right = new List<int>();
+
+            n = int.Parse(Console.ReadLine());
+            for (int i = 0; i < n; i++)
+            {
+                var inputs = Console.ReadLine().Split();
+                key.Add(int.Parse(inputs[0]));
+                left.Add(int.Parse(inputs[1]));
+                right.Add(int.Parse(inputs[2]));
+            }
+        }
+        static List<int> InOrder()
+        {
+            result.Clear();
+            InOrderTraversal(0);
+            return result;
+        }
+        static void InOrderTraversal(int index)
+        {
+            if (left[index] != -1)
+                InOrderTraversal(left[index]);
+            result.Add(key[index]);
+            if (right[index] != -1)
+                InOrderTraversal(right[index]);
+        }
+        private static bool CheckBst()
+        {
+            for (int i = 0; i < n - 1; i++)
+            {
+                if (result[i] > result[i + 1])
+                {
+                    return false;
+                }
+                else if (result[i] == result[i + 1])
+                {
+
+                }
+            }
+
+            return true;
+        }
+
+        private static void Print(bool isBst)
+        {
+            Console.WriteLine(isBst ? "CORRECT" : "INCORRECT");
+        }
+    }
+}
