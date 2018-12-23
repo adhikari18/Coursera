@@ -1,0 +1,102 @@
+using System;
+using System.Collections.Generic;
+
+namespace BST
+{
+    class Node
+    {
+        public int Key { get; set; }
+        public int Left { get; set; }
+        public int Right { get; set; }
+        public int Index { get; set; }
+
+        public Node(int key, int left, int right, int index)
+        {
+            Key = key;
+            Left = left;
+            Right = right;
+            Index = index;
+        }
+    }
+    public class IsBSTHard
+    {
+
+        private static int n;
+        private static List<int> key;
+        private static List<int> left;
+        private static List<int> right;
+        private static List<int> result;
+        private static List<Node> resultNodes;
+        
+        private static void Main(string[] args)
+        {
+            result = new List<int>();
+            resultNodes = new List<Node>();
+            Read();
+            if(n == 0)
+                Print(true);
+            else
+            {
+                InOrder();
+                Print(CheckBst());
+            }
+
+            Console.ReadKey();
+        }
+
+        static void Read()
+        {
+            key = new List<int>();
+            left = new List<int>();
+            right = new List<int>();
+
+            n = int.Parse(Console.ReadLine());
+            for (int i = 0; i < n; i++)
+            {
+                var inputs = Console.ReadLine().Split();
+                key.Add(int.Parse(inputs[0]));
+                left.Add(int.Parse(inputs[1]));
+                right.Add(int.Parse(inputs[2]));
+            }
+        }
+        static List<int> InOrder()
+        {
+            result.Clear();
+            InOrderTraversal(0);
+            return result;
+        }
+        static void InOrderTraversal(int index)
+        {
+            if (left[index] != -1)
+                InOrderTraversal(left[index]);
+            resultNodes.Add(new Node(key[index], left[index], right[index], index));
+            result.Add(key[index]);
+            if (right[index] != -1)
+                InOrderTraversal(right[index]);
+        }
+        private static bool CheckBst()
+        {
+            for (int i = 1; i < n; i++)
+            {
+                if (result[i - 1] > result[i])
+                {
+                    return false;
+                }
+                else if (result[i - 1] == result[i])
+                {
+                    if (resultNodes[i].Left == resultNodes[i - 1].Index)
+                    {
+                        return false;
+                    }
+                }
+            }
+
+            return true;
+        }
+
+        private static void Print(bool isBst)
+        {
+            Console.WriteLine(isBst ? "CORRECT" : "INCORRECT");
+        }
+    }
+}
