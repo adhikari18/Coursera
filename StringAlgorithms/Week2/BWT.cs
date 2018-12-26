@@ -1,8 +1,6 @@
 using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Text;
-using System.Threading.Tasks;
 
 namespace StringAlgoCSharp
 {
@@ -17,20 +15,19 @@ namespace StringAlgoCSharp
 
         static string GetBWT(string text)
         {
-            StringBuilder result = new StringBuilder();
-
-            var bwtRotation = new List<string>();
-            var tempString = text;
-            for (var i = 0; i < text.Length; i++)
+            var result = new StringBuilder();
+            var textLength = text.Length;
+            var bwtRotated = new List<string>();
+            for (var i = 0; i < textLength; i++)
             {
-                tempString = RotateString(tempString);
-                bwtRotation.Add(tempString);
+                text = RotateString(text);
+                bwtRotated.Add(text);
             }
 
-            bwtRotation.Sort();
-            for (var i = 0; i < text.Length; i++)
+            bwtRotated.Sort();
+            foreach (var t in bwtRotated)
             {
-                result.Append(bwtRotation[i][text.Length - 1]);
+                result.Append(t[textLength - 1]);
             }
 
             return result.ToString();
@@ -38,7 +35,6 @@ namespace StringAlgoCSharp
 
         static string RotateString(string str)
         {
-            if (str.Length <= 1) return str;
             return str[str.Length - 1] + str.Substring(0, str.Length - 1);
         }
     }
