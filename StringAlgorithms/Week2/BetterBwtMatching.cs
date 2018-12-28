@@ -41,7 +41,8 @@ namespace StringAlgoCSharp
                 {
                     patternLength--;
                     var letter = pattern[patternLength];
-                    if (!occCountsBefore.TryGetValue(letter, out var val)) return 0;
+                    int[] val;
+                    if (!occCountsBefore.TryGetValue(letter, out val)) return 0;
 
                     var topOccurence = occCountsBefore[letter][top];
                     var bottomOccurence = occCountsBefore[letter][bottom + 1];
@@ -64,7 +65,8 @@ namespace StringAlgoCSharp
             Array.Sort(sortBwt);
             for (var i = 0; i < sortBwt.Length; i++)
             {
-                if (!starts.TryGetValue(sortBwt[i], out var val)) starts.Add(sortBwt[i], i);
+                int val;
+                if (!starts.TryGetValue(sortBwt[i], out val)) starts.Add(sortBwt[i], i);
             }
 
             foreach (var ch in starts.Keys)
