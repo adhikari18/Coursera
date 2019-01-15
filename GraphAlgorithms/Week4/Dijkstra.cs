@@ -60,10 +60,10 @@ namespace GraphAlgo
                 distances[i] = int.MaxValue;
             }
             distances[source] = 0;
-            var queue = new List<Node> {new Node(source, distances[source])};
+            var queue = new List<Node> { new Node(source, distances[source]) };
             while (queue.Count > 0)
             {
-                var u = queue.OrderByDescending(x => x.Distance).First();
+                var u = queue.First();//.OrderByDescending(x => x.Distance).First();
                 queue.Remove(u);
                 var uIndex = u.Index;
                 foreach (var v in adjacent[uIndex])
@@ -73,6 +73,9 @@ namespace GraphAlgo
                     {
                         distances[v] = distances[uIndex] + cost[uIndex][vIndex];
                         queue.Add(new Node(v, distances[v]));
+                        queue.Sort((x, y) =>
+                        (int)(x.Distance - y.Distance)
+                            );
                     }
                 }
             }
