@@ -1,3 +1,6 @@
+//Failed case #8/36: Wrong answer
+
+// (Time used: 0.07/3.00, memory used: 10252288/536870912.)
 using System;
 using System.Collections.Generic;
 
