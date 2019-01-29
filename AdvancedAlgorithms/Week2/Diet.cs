@@ -1,127 +1,139 @@
 using System;
 using System.Collections.Generic;
+using System.Linq;
 
 namespace AdvancedAlgos
 {
-    class Diet
+    internal class Diet
     {
         private static void Main(string[] args)
         {
             var firstLine = Console.ReadLine().Split();
+            var n = int.Parse(firstLine[0]);
+            var m = int.Parse(firstLine[1]);
 
+            var matrix = new double[n][];
+            
+            for (var i = 0; i < n; i++)
+            {
+                if (matrix[i] == null)
+                    matrix[i] = new double[m];
+                var input = Console.ReadLine().Split();
+                for (var j = 0; j < m; j++)
+                {
+                    matrix[i][j] = int.Parse(input[j]);
+                }
+            }
+            var b = new double[n];
+            var bInput = Console.ReadLine().Split();
+            for (var i = 0; i < n; i++)
+            {
+                b[i] = double.Parse(bInput[i]);
+            }
 
+            var c = new double[m];
+            var cInput = Console.ReadLine().Split();
+            for (var i = 0; i < m; i++)
+            {
+                c[i] = double.Parse(cInput[i]);
+            }
 
-
+            var linearEquations = new LinearEquations(matrix, b, c);
+            linearEquations.PrintResult();
             Console.ReadKey();
         }
     }
 
-    class LinearEquationsSolver
+    internal class LinearEquations
     {
-        double[][] A; //co-efficient matrix
-        double[] b; //output matrix for co-efficicnet
-        double[] c; //objective function matrix
+        private readonly double[][] _a; //co-efficient matrix
+        private readonly double[] _b; //output matrix for co-efficicnet
+        private readonly double[] _c; //objective function matrix
 
-        int n;//no of input equations
-        int m; // no of variables
-        double maxValue = Double.MinValue;//.MinValue;
-        double[] result = null;
-        static double INFINITY = Math.Pow(10, 9);
-        private bool bounded = true;
+        private readonly int _n;//no of input equations
+        private readonly int _m; // no of variables
+        private double _maxValue = double.MinValue;//.MinValue;
+        private double[] _result;
+        private static readonly double Infinity = Math.Pow(10, 9);
+        private bool _bounded = true;
 
-        LinearEquationsSolver(double[][] A, double[] b, double[] c)
+        public LinearEquations(double[][] a, double[] b, double[] c)
         {
-            n = A.Length;
-            m = c.Length;
-            this.A = A;
-            this.b = b;
-            this.c = c;
-            //total no of inequalities = n +m + 1(for infinity)
-            int total = n + m + 1;
-            compute(total);
+            _n = a.Length;
+            _m = c.Length;
+            _a = a;
+            _b = b;
+            _c = c;
+
+            var total = _n + _m + 1;
+            Compute(total);
         }
 
-        public void print()
+        public void PrintResult()
         {
-            if (maxValue == Double.MinValue)
+            if (_maxValue == double.MinValue)
             {
                 Console.WriteLine("No solution");
                 return;
             }
-            if (!bounded)
+            if (!_bounded)
             {
                 Console.WriteLine("Infinity");
                 return;
             }
             Console.WriteLine("Bounded solution");
-            for (int i = 0; i < result.Length; i++)
+            foreach (var val in _result)
             {
-                //System.out.print(String.format("%.15f", result[i]) + " ");
+                Console.Write( val.ToString("F15") + " ");
             }
         }
 
-        private void compute(int total)
+        private void Compute(int total)
         {
-            int[] arr = new int[total];
-            for (int i = 0; i < arr.Length; i++)
+            var arr = new int[total];
+            for (var i = 0; i < arr.Length; i++)
             {
                 arr[i] = i;
             }
-            genProcessCombinations(arr, total, m);
+            GenProcessCombinations(arr, total, _m);
         }
 
-        /**
-         * Process subset of size
-         * @param subset
-         */
-        private void processSubset(List<int> subset)
+        private void ProcessSubset(List<int> subset)
         {
-            double[][] A = new double[m][];
-            double[] b = new double[m];
-            updateMatrices(subset, A, b);
-            GaussianElimination gElim = new GaussianElimination(A, b);
-            if (!gElim.hasSolution)
+            var a = new double[_m][];
+            var b = new double[_m];
+            UpdateMatrices(subset, a, b);
+            var gaussElimination = new GaussianElimination(a, b);
+            if (!gaussElimination.HasSolution)
             {
                 return;
             }
-            double[] temp_result = gElim.b;
-            if (!satisfiesAllInEq(temp_result))
+            var tempResult = gaussElimination.B;
+            if (!SatisfiesAllInEq(tempResult))
             {
                 return;
             }
-            double val = computeVal(temp_result);
-            if (val > maxValue)
+            var val = ComputeVal(tempResult);
+            if (val > _maxValue)
             {
-                maxValue = val;
-                result = temp_result;
-                if (subset.Contains(n + m))
-                {
-                    bounded = false;
-                }
-                else
-                {
-                    bounded = true;
-                }
+                _maxValue = val;
+                _result = tempResult;
+                _bounded = !subset.Contains(_n + _m);
             }
         }
 
-        /**
-         * Verify result satisfies all the equations
-         * @param result
-         * @return
-         */
-        private bool satisfiesAllInEq(double[] result)
+        private bool SatisfiesAllInEq(double[] result)
         {
-            bool satisfied = true;
+            var satisfied = true;
             //check to see if eq satisfies regular equations
-            for (int i = 0; i < n; i++)
+            for (var i = 0; i < _n; i++)
             {
                 double inEqSum = 0;
-                for (int j = 0; j < m; j++)
+                for (var j = 0; j < _m; j++)
                 {
-                    inEqSum += result[j] * this.A[i][j];
+                    inEqSum += result[j] * _a[i][j];
                 }
-                if (inEqSum > b[i] + Math.Pow(10, -3))
+                if (inEqSum > _b[i] + Math.Pow(10, -3))
                 {
                     //not satisfied
                     satisfied = false;
@@ -129,7 +141,7 @@ namespace AdvancedAlgos
                 }
             }
             //check to see if it satisfies constraints
-            for (int i = 0; i < m; i++)
+            for (var i = 0; i < _m; i++)
             {
                 if (result[i] * -1 > Math.Pow(10, -3))
                 {
@@ -143,218 +155,170 @@ namespace AdvancedAlgos
 
         }
 
-        private double computeVal(double[] result)
+        private double ComputeVal(IReadOnlyList<double> result)
         {
-            double val = 0;
-            for (int i = 0; i < result.Length; i++)
-            {
-                val += result[i] * c[i];
-            }
-            return val;
+            return result.Select((t, i) => t * _c[i]).Sum();
         }
 
-        /**
-         * Update matrices
-         */
-        private void updateMatrices(List<int> set, double[][] A, double[] b)
+        private void UpdateMatrices(IEnumerable<int> set, IList<double[]> a, IList<double> b)
         {
-            int index = 0;
-            foreach (int val in set)
+            var index = 0;
+            foreach (var val in set)
             {
-                if (val < n)
+                if (val < _n)
                 {
-                    A[index] = this.A[val];
-                    b[index] = this.b[val];
+                    a[index] = _a[val];
+                    b[index] = _b[val];
                 }
-                else if (val < n + m)
+                else if (val < _n + _m)
                 {
-                    int diff = val - n;
-                    A[index] = new double[m];
-                    A[index][diff] = -1;
+                    var diff = val - _n;
+                    a[index] = new double[_m];
+                    a[index][diff] = -1;
                     b[index] = 0;
                 }
                 else
                 {
-                    A[index] = new double[m];
-                    //TODO:  Arrays.fill(A[index], 1);
-                    b[index] = INFINITY;
+                    a[index] = new double[_m];
+                    a[index] = Enumerable.Repeat(1d, _m).ToArray();
+                    b[index] = Infinity;
                 }
                 index += 1;
             }
         }
 
-
-        /**
-          arr[]  ---> Input Array
-        data[] ---> Temporary array to store current combination
-        start & end ---> Staring and Ending indexes in arr[]
-        index  ---> Current index in data[]
-        r ---> Size of a combination to be printed
-         **/
-        void combinationUtil(int[] arr, int n, int r, int index,
-                                    int[] data, int i)
+        private void CombinationUtil(IReadOnlyList<int> arr, int n, int r, int index, IList<int> data, int i)
         {
-            // Current combination is ready to be printed, print it
             if (index == r)
             {
-                List<int> set = new List<int>();
-                for (int j = 0; j < r; j++)
+                var set = new List<int>();
+                for (var j = 0; j < r; j++)
                     set.Add(data[j]);
-                processSubset(set);
+                ProcessSubset(set);
                 return;
             }
 
             // When no more elements are there to put in data[]
             if (i >= n)
                 return;
-
-            // current is included, put next at next location
+            
             data[index] = arr[i];
-            combinationUtil(arr, n, r, index + 1, data, i + 1);
-
-            // current is excluded, replace it with next (Note that
-            // i+1 is passed, but index is not changed)
-            combinationUtil(arr, n, r, index, data, i + 1);
+            CombinationUtil(arr, n, r, index + 1, data, i + 1);
+            CombinationUtil(arr, n, r, index, data, i + 1);
         }
 
-        /**
-         *     The main function that prints all combinations of size r
-         *      in arr[] of size n. This function mainly uses combinationUtil()
-         */
-        void genProcessCombinations(int[] arr, int n, int r)
+        private void GenProcessCombinations(int[] arr, int n, int r)
         {
-            // A temporary array to store all combination one by one
-            int[] data = new int[r];
-            //Set<Set<int>> result = new HashSet<Set<int>>();
-            // Print all combination using temprary array 'data[]'
-            combinationUtil(arr, n, r, 0, data, 0);
+            var data = new int[r];
+            CombinationUtil(arr, n, r, 0, data, 0);
         }
     }
 
-    class GaussianElimination
+    internal class GaussianElimination
     {
-        private double[][] A; //refers to co-efficient matrix
-        public double[] b; //refers to output matrix
-        public bool hasSolution = true;
+        private double[][] _a; //refers to co-efficient matrix
+        public double[] B; //refers to output matrix
+        public bool HasSolution = true;
 
 
-        public GaussianElimination(double[][] A, double[] b)
+        public GaussianElimination(IReadOnlyList<double[]> a, IReadOnlyList<double> b)
         {
-            if (A == null || b == null)
+            if (a == null || b == null)
             {
-                hasSolution = false;
+                HasSolution = false;
                 return;
             }
-            if (A.Length == 0 || b.Length == 0)
+            if (a.Count == 0 || b.Count == 0)
             {
-                hasSolution = false;
+                HasSolution = false;
                 return;
             }
-            copyMatrix(A);
-            copyMatrix(b);
-            rowReduce();
+            CopyMatrix(a);
+            CopyMatrix(b);
+            RowReduce();
         }
 
-        private void rowReduce()
+        private void RowReduce()
         {
-            int rowLength = A.Length;
-            for (int row = 0; row < rowLength; row++)
+            var rowLength = _a[0].Length;
+            for (var row = 0; row < rowLength; row++)
             {
-                int rowPivot = getRowPivot(A, row);
+                var rowPivot = GetRowPivot(_a, row);
                 if (rowPivot == -1)
                 {
-                    hasSolution = false;
+                    HasSolution = false;
                     return;
                 }
                 if (rowPivot != row)
                 {
                     //swap rows
-                    swapRowsInA(row, rowPivot);
-                    swapIndexInb(row, rowPivot);
+                    SwapRowsInA(row, rowPivot);
+                    SwapIndexInb(row, rowPivot);
                 }
                 //pivot element is located in col <row> for current row < row>
                 //rescale to make pivot as 1
-                if (A[row][row] != 1)
+                if (_a[row][row] != 1)
                 {
                     //rescale entire row
-                    rescalePivot(row);
+                    RescalePivot(row);
                 }
                 //make col zero
-                for (int r = 0; r < rowLength; r++)
+                for (var r = 0; r < rowLength; r++)
                 {
                     if (row == r)
                     {
                         continue;
                     }
-                    makeColZero(row, r);
+                    MakeColZero(row, r);
 
                 }
             }
         }
 
-        /**
-         * Print result of b
-         */
-        public void printResult()
+        private void MakeColZero(int currentRow, int row)
         {
-            if (hasSolution)
+            var scaleFactor = _a[row][currentRow];
+            for (var col = 0; col < _a[0].Length; col++)
             {
-                for (int row = 0; row < b.Length; row++)
-                {
-                    Console.WriteLine(b[row] + " ");
-                }
+                _a[row][col] = _a[row][col] - scaleFactor * _a[currentRow][col];
             }
+            B[row] = B[row] - scaleFactor * B[currentRow];
         }
 
-        /**
-         * Make col entries as zero for the pivot row of A and update b
-         * @param current_row pi
-         * @param row
-         */
-        private void makeColZero(int current_row, int row)
+        private void RescalePivot(int row)
         {
-            double scale_factor = A[row][current_row];
-            for (int col = 0; col < A[0].Length; col++)
+            var scaleFactor = _a[row][row];
+            for (var col = 0; col < _a[0].Length; col++)
             {
-                A[row][col] = A[row][col] - scale_factor * A[current_row][col];
+                _a[row][col] = _a[row][col] / scaleFactor;
             }
-            b[row] = b[row] - scale_factor * b[current_row];
-        }
-
-        private void rescalePivot(int row)
-        {
-            double scale_factor = A[row][row];
-            for (int col = 0; col < A[0].Length; col++)
-            {
-                A[row][col] = A[row][col] / scale_factor;
-            }
-            b[row] = b[row] / scale_factor;
+            B[row] = B[row] / scaleFactor;
         }
 
         /**
          * Swap rows i and j of A
          */
-        private void swapRowsInA(int i, int j)
+        private void SwapRowsInA(int i, int j)
         {
-            double[] temp = A[i];
-            A[i] = A[j];
-            A[j] = temp;
+            var temp = _a[i];
+            _a[i] = _a[j];
+            _a[j] = temp;
         }
 
         /**
          * Swap values in ith and jth index of b
          */
-        private void swapIndexInb(int i, int j)
+        private void SwapIndexInb(int i, int j)
         {
-            double temp = b[i];
-            b[i] = b[j];
-            b[j] = temp;
+            var temp = B[i];
+            B[i] = B[j];
+            B[j] = temp;
         }
 
-        private int getRowPivot(double[][] matrix, int row)
+        private static int GetRowPivot(IReadOnlyList<double[]> matrix, int row)
         {
             //select first non zero entry in left most column
-            for (int r = row; r < matrix.Length; r++)
+            for (var r = row; r < matrix.Count; r++)
             {
                 if (matrix[r][row] != 0)
                 {
@@ -364,36 +328,27 @@ namespace AdvancedAlgos
             return -1;
         }
 
-        /**
-         * Copy input A to have a local copy < avoid modifying client</>
-         * @param matrix
-         */
-        private void copyMatrix(double[][] matrix)
+        private void CopyMatrix(IReadOnlyList<double[]> matrix)
         {
-            A = new double[matrix.Length][];
-            for (int i = 0; i < matrix.Length; i++)
+            _a = new double[matrix.Count][];
+            for (var i = 0; i < matrix.Count; i++)
             {
-                for (int j = 0; j < matrix[0].Length; j++)
+                if(_a[i] == null)
+                    _a[i] = new double[matrix[0].Length];
+                for (var j = 0; j < matrix[0].Length; j++)
                 {
-                    this.A[i][j] = matrix[i][j];
+                    _a[i][j] = matrix[i][j];
                 }
             }
         }
 
-        /**
-         * Copy input B to have a local copy < avoid modifying client</>
-         * @param matrix
-         */
-        private void copyMatrix(double[] matrix)
+        private void CopyMatrix(IReadOnlyList<double> matrix)
         {
-            b = new double[matrix.Length];
-            for (int i = 0; i < matrix.Length; i++)
+            B = new double[matrix.Count];
+            for (var i = 0; i < matrix.Count; i++)
             {
-                b[i] = matrix[i];
+                B[i] = matrix[i];
             }
-
         }
-
     }
-
 }
