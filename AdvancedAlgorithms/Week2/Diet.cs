@@ -1,3 +1,4 @@
+/* Good job! (Max time used: 0.19/3.00, max memory used: 13066240/536870912.) */
 using System;
 using System.Collections.Generic;
 using System.Linq;
