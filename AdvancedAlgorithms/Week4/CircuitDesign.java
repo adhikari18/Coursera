@@ -1,4 +1,3 @@
-//TODO submit
 import java.io.*;
 import java.util.*;
 
@@ -90,7 +89,7 @@ public class CircuitDesign {
                         isNegative = false;
                     }
                     if(result[x]==-1){
-                        if(isNegative)	result[x] = 1;
+                        if(isNegative) result[x] = 1;
                         else result[x] = 0;
                     }
                 }
