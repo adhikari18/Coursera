@@ -1,0 +1,69 @@
+//Prims Algo for Minimum Spanning Tree
+
+	public class PrimsAlgo
+	{
+		public void Print(int[] parent, int[,] graph, int verticesCount)
+		{
+			Console.WriteLine("Edge     Weight");
+			for (int i = 1; i < verticesCount; ++i)
+				Console.WriteLine("{0} - {1}    {2}", parent[i], i, graph[i, parent[i]]);
+		}
+		private int MinKey(int[] key, bool[] set, int verticesCount)
+		{
+			int min = int.MaxValue, minIndex = 0;
+			for (int v = 0; v < verticesCount; ++v)
+			{
+				if (!set[v] && key[v] < min)
+				{
+					min = key[v];
+					minIndex = v;
+				}
+			}
+			return minIndex;
+		}
+
+		public int[] Prim(int[,] graph, int verticesCount)
+		{
+			int[] parent = new int[verticesCount];
+			int[] distances = new int[verticesCount];
+			bool[] visited = new bool[verticesCount];
+
+			Array.Fill(distances, int.MaxValue);
+			distances[0] = 0;
+			parent[0] = -1;
+
+			for (int count = 0; count < verticesCount - 1; ++count)
+			{
+				int u = MinKey(distances, visited, verticesCount);
+				visited[u] = true;
+
+				for (int v = 0; v < verticesCount; ++v)
+				{
+					if (graph[u, v] > 0 && !visited[v] && graph[u, v] < distances[v])
+					{
+						parent[v] = u;
+						distances[v] = graph[u, v];
+					}
+				}
+			}
+			return parent;
+		}
+
+	}
+	public class Driver
+	{
+		public static void Main(string[] args)
+		{
+			var prims = new PrimsAlgo();
+			int[,] graph = {
+				{ 0, 2, 0, 6, 0 },
+				{ 2, 0, 3, 8, 5 },
+				{ 0, 3, 0, 0, 7 },
+				{ 6, 8, 0, 0, 9 },
+				{ 0, 5, 7, 9, 0 },
+			};
+
+			var res = prims.Prim(graph, 5);
+			prims.Print(res, graph, 5);
+		}
+	}
